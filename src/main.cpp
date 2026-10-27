@@ -380,7 +380,7 @@ namespace {
     std::deque<std::string> exportLines;
     int logClock = 0;  // physics steps since the level started, kept by the update hook
 
-    template <class... Args>
+    template <... Args>
     void say(fmt::format_string<Args...> f, Args&&... args) {
         auto msg = fmt::format(f, std::forward<Args>(args)...);
         exportLines.push_back(fmt::format("[{:>6}] {}", logClock, msg));
@@ -549,7 +549,7 @@ namespace {
         // v2.57: hidden in practice mode (practice runs can't be submitted, and it crowded the
         // checkpoint buttons); always shown in normal mode while the buffer is on.
         auto* layer = GameManager::get()->m_playLayer;
-        buf.watermark->setVisible(buf.enabled && !(layer && layer->m_isPracticeMode));
+        buf.watermark->setVisible(false);
         buf.watermark->setString(fmt::format("Click Before Frames  |  {}", stageText()).c_str());
     }
 
@@ -885,7 +885,7 @@ namespace {
     HoldStats tapHold, robotHold;
     int tickCount = 0;
 
-    enum class InputKind { Tap, Wave, Robot, Other };
+    enum  InputKind { Tap, Wave, Robot, Other };
     int pressTick = -1;
     InputKind pressKind = InputKind::Other;
 
@@ -1394,7 +1394,7 @@ namespace {
         }
     }
 
-    enum class SimEnd { Ok, StopSearch };
+    enum  SimEnd { Ok, StopSearch };
 
     // Returns ticks survived after the input (horizon = fully safe).
     // releaseAfter: ticks after the input at which the ghost does the opposite (-1 = never).
@@ -3301,7 +3301,7 @@ namespace {
 
 // v2.44 in-game menu: pause menu button or F7 in a level. Stage, the main switches,
 // status, and shortcuts to all settings / copy log / forget level.
-class BufferMenu : public geode::Popup {
+ BufferMenu : public geode::Popup {
     struct Option {
         char const* key;    // mod setting, or nullptr for the runtime path view
         char const* label;
@@ -3625,7 +3625,7 @@ public:
 };
 
 // v2.46: the level complete screen says so if the buffer was on during the attempt.
-class $modify(BufEndLevelLayer, EndLevelLayer) {
+ $modify(BufEndLevelLayer, EndLevelLayer) {
     void customSetup() {
         EndLevelLayer::customSetup();
         if (!buf.usedThisAttempt) {
@@ -3654,7 +3654,7 @@ class $modify(BufEndLevelLayer, EndLevelLayer) {
     }
 };
 
-class $modify(BufPauseLayer, PauseLayer) {
+ $modify(BufPauseLayer, PauseLayer) {
     void customSetup() {
         PauseLayer::customSetup();
         auto* sprite = ButtonSprite::create("Buffer", "bigFont.fnt", BufferMenu::currentTheme().button, 0.8f);
@@ -3705,7 +3705,7 @@ $on_mod(Loaded) {
     say("v2.77 loaded. F6 cycles: 0.5f -> 1f -> 2f -> 4f -> 6f -> 8f -> custom -> off");
 }
 
-class $modify(BufPlayLayer, PlayLayer) {
+ $modify(BufPlayLayer, PlayLayer) {
     static void onModify(auto& self) {
         (void)self.setHookPriority("PlayLayer::destroyPlayer", HOOK_PRIORITY);
         (void)self.setHookPriority("PlayLayer::playEndAnimationToPos", HOOK_PRIORITY);
@@ -3955,7 +3955,7 @@ class $modify(BufPlayLayer, PlayLayer) {
     }
 };
 
-class $modify(BufEditorLayer, LevelEditorLayer) {
+ $modify(BufEditorLayer, LevelEditorLayer) {
     bool init(GJGameLevel* level, bool noUI) {
         bool ok = LevelEditorLayer::init(level, noUI);
         dropGhosts();
@@ -3963,7 +3963,7 @@ class $modify(BufEditorLayer, LevelEditorLayer) {
     }
 };
 
-class $modify(BufHardStreak, HardStreak) {
+ $modify(BufHardStreak, HardStreak) {
     static void onModify(auto& self) {
         (void)self.setHookPriority("HardStreak::addPoint", HOOK_PRIORITY);
     }
@@ -3976,7 +3976,7 @@ class $modify(BufHardStreak, HardStreak) {
     }
 };
 
-class $modify(BufEffectGameObject, EffectGameObject) {
+ $modify(BufEffectGameObject, EffectGameObject) {
     static void onModify(auto& self) {
         (void)self.setHookPriority("EffectGameObject::triggerObject", HOOK_PRIORITY);
     }
@@ -3989,7 +3989,7 @@ class $modify(BufEffectGameObject, EffectGameObject) {
     }
 };
 
-class $modify(BufGameObject, GameObject) {
+ $modify(BufGameObject, GameObject) {
     static void onModify(auto& self) {
         (void)self.setHookPriority("GameObject::playShineEffect", HOOK_PRIORITY);
     }
@@ -4002,7 +4002,7 @@ class $modify(BufGameObject, GameObject) {
     }
 };
 
-class $modify(BufPlayerObject, PlayerObject) {
+ $modify(BufPlayerObject, PlayerObject) {
     static void onModify(auto& self) {
         (void)self.setHookPriority("PlayerObject::playSpiderDashEffect", HOOK_PRIORITY);
         // v2.18: run before Click Between Frames, so this sees each physics tick once, with
@@ -4194,7 +4194,7 @@ class $modify(BufPlayerObject, PlayerObject) {
 
 // F6 via the game's own keyboard events: no polling, and it only fires while GD has
 // focus (v1 polled GetAsyncKeyState every physics tick, even when tabbed out).
-class $modify(BufKeyboard, CCKeyboardDispatcher) {
+ $modify(BufKeyboard, CCKeyboardDispatcher) {
     bool dispatchKeyboardMSG(enumKeyCodes key, bool isKeyDown, bool isKeyRepeat, double timestamp) {
         if (isKeyDown && !isKeyRepeat && GameManager::get()->m_playLayer) {
             // v2.75: rebindable in the settings
@@ -4236,7 +4236,7 @@ class $modify(BufKeyboard, CCKeyboardDispatcher) {
     }
 };
 
-class $modify(BufBaseGameLayer, GJBaseGameLayer) {
+ $modify(BufBaseGameLayer, GJBaseGameLayer) {
     static void onModify(auto& self) {
         (void)self.setHookPriority("GJBaseGameLayer::canBeActivatedByPlayer", HOOK_PRIORITY);
         (void)self.setHookPriority("GJBaseGameLayer::handleButton", HOOK_PRIORITY);
